@@ -1,0 +1,21 @@
+# runs local docker container on localhost, port 8000
+# this is not used for deployment
+version: '3.7'
+
+services:
+  app:
+    build:
+        context: .
+    command: >
+       sh -c "python manage.py migrate &&
+       python manage.py runserver 0.0.0.0:8000"
+    environment:
+        - DEBUG=1
+        - SECRET_KEY=${SECRET_KEY:-qwerty}
+        - ALLOWED_HOSTS=${MY_HOST:-localhost,127.0.0.1}
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app
+
