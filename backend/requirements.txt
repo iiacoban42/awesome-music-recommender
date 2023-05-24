@@ -1,6 +1,8 @@
 asgiref==3.4.1
 astroid==2.8.0
 Django==3.2.19
+django-filter==21.1
+channels==3.0.4
 isort==5.9.3
 lazy-object-proxy==1.6.0
 mccabe==0.6.1
