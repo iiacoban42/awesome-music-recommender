@@ -1,7 +1,7 @@
 const { REST, Routes } = require('discord.js');
-require('json5/lib/register')
+require('json5/lib/register');
 
-const commands = require('./commands.json5')
+const commands = require('./commands.json5');
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 

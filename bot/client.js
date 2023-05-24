@@ -1,7 +1,8 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
+const musicRecommender = require('./musicRecommender.js');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds,  GatewayIntentBits.GuildMessageReactions] });
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -37,6 +38,7 @@ async function join(interaction) {
             adapterCreator: voiceChannel.guild.voiceAdapterCreator,
         });
         await interaction.reply("Let's recommend some music!");
+        musicRecommender(client, interaction)
     } catch (error) {
         console.error(`Failed to join the voice channel: ${error}`);
         await interaction.reply('Failed to join the voice channel. Please try again later.');
@@ -44,8 +46,8 @@ async function join(interaction) {
 }
 
 async function leave(interaction) {
-    let channel = interaction.member.voice.channel
-    const connection = getVoiceConnection(channel.guild.id);
+    let voiceChannel = interaction.member.voice.channel
+    const connection = getVoiceConnection(voiceChannel.guild.id);
     try {
         connection.destroy();
         await interaction.reply("Hate to see you leave but love to watch you go!")
