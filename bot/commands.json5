@@ -1,0 +1,10 @@
+[
+    {
+        "name": "join",
+        "description": "Connects the bot to the users voice channel and start recommending music!",
+    },
+    {
+        "name": "leave",
+        "description": "Disconnects the bot from the voice channel",
+    },
+]
