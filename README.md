@@ -4,9 +4,8 @@
 
 ## Requirements
 
-- Python3
-- Docker and docker-compose if running the system or the database from a container
--
+- python3
+- Docker and docker-compose (optional)
 ## Setup Django server
 
 1. Create a python environment (one time instruction):
