@@ -1,6 +1,7 @@
-const { getVoiceConnection } = require('@discordjs/voice');
 require('json5/lib/register');
+const ytdl = require('ytdl-core');
 const contexts = require('./contexts.json5');
+const { createAudioPlayer, createAudioResource, joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
 
 let context = null;
 let activity_name = '';
@@ -38,19 +39,42 @@ module.exports = function (client, interaction) {
 
         if (!Object.keys(context).includes('contexts')) {
             // Check if we are done specifying the context
+            if (activity_name == ''){
+                activity_name = context.name
+            }
+
             interaction.channel.send(`Context selected ${JSON.stringify(context)}`);
             let context_name = context.name;
             try {
-                const url = await fetchMusic(activity_name, context_name);
-                interaction.channel.send(`Track URL ${JSON.stringify(url)}`);
-                const voiceConnection = getVoiceConnection(interaction.guildId);
+                const json_url = await fetchMusic(activity_name, context_name);
+                interaction.channel.send(`Track URL ${json_url.url}`);
+
+                const connection = getVoiceConnection({
+                    guildId: interaction.guild.id,
+                })
+
+                // const voiceConnection = joinVoiceChannel({
+                //     channelId: interaction.id,
+                //     guildId: interaction.guild.id,
+                //     adapterCreator: interaction.guild.voiceAdapterCreator,
+                // });
+
+                const stream = ytdl(json_url.url, { filter: 'audioonly' });
+                const resource = createAudioResource(stream);
+                const player = createAudioPlayer();
+
+                connection.subscribe(player);
+                player.play(resource);
+
+                message.reply(`Now playing  ${json_url.url}!`);
+
             } catch (e) {
                 console.log(e)
             }
             return;
-        } else {
-            activity_name = context.name;
         }
+
+        activity_name = context.name;
         context = context.contexts; // Narrow down the context further
         askContext(interaction.channel, context, 'Specify the context further:');
     })
