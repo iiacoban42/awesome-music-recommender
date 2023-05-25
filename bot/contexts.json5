@@ -1,0 +1,16 @@
+{
+    '🗨️': {
+        name: 'just chatting',
+    }, 
+    '📔': {
+        name: 'studying',
+    },
+    '🎮': {
+        name: 'gaming',
+        contexts: {
+            '🔫': {
+                name: 'fps',
+            },
+        },
+    },
+}
