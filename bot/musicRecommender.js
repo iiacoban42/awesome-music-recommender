@@ -1,3 +1,4 @@
+const { getVoiceConnection } = require('@discordjs/voice');
 require('json5/lib/register');
 const contexts = require('./contexts.json5');
 
@@ -42,6 +43,7 @@ module.exports = function (client, interaction) {
             try {
                 const url = await fetchMusic(activity_name, context_name);
                 interaction.channel.send(`Track URL ${JSON.stringify(url)}`);
+                const voiceConnection = getVoiceConnection(interaction.guildId);
             } catch (e) {
                 console.log(e)
             }
