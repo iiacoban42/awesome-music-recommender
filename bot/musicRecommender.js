@@ -2,24 +2,25 @@ require('json5/lib/register');
 const contexts = require('./contexts.json5');
 
 let context = null;
-let activity_name = ""
+let activity_name = '';
 
 async function askContext(textChannel, context, question) {
     const message = await textChannel.send(question);
     for (let emojiOption in context) {
-        await message.react(emojiOption);
+        message.react(emojiOption);
     }
 }
 
 async function fetchMusic(activity, context) {
-    await fetch(`http://127.0.0.1:8000/get-new-track/${activity}/${context}/`)
-    .then(response => {
-        return response.json()
-            }
-        ).catch(e => console.log(e));
+    try {
+        let response = await fetch(`http://127.0.0.1:8000/get-new-track/${activity}/${context}/`);
+        return response.json();
+    } catch (e) {
+        console.log(e);
+    }
 }
 
-module.exports = function(client, interaction) {
+module.exports = function (client, interaction) {
     client.on('messageReactionAdd', async (reaction, user) => {
         if (user.bot) return; // Ignore reactions from bots
 
@@ -34,21 +35,19 @@ module.exports = function(client, interaction) {
 
         context = context[emoji];
 
-        if (!Object.keys(context).includes("contexts")) { // Check if we are done specifying the context
+        if (!Object.keys(context).includes('contexts')) {
+            // Check if we are done specifying the context
             interaction.channel.send(`Context selected ${JSON.stringify(context)}`);
-            let context_name = context.name
-            await fetchMusic(activity_name, context_name)
-            .then(url => {
-                interaction.channel.send(`Track URL ${url}`);
-            });
-
+            let context_name = context.name;
+            const url = await fetchMusic(activity_name, context_name);
+            interaction.channel.send(`Track URL ${JSON.stringify(url)}`);
             return;
-        }else{
-            activity_name = context.name
+        } else {
+            activity_name = context.name;
         }
         context = context.contexts; // Narrow down the context further
-        askContext(interaction.channel, context, 'Specify the context further:')
-    });
+        askContext(interaction.channel, context, 'Specify the context further:');
+    })
     context = contexts;
-    askContext(interaction.channel, context, 'Please select the current context:')
+    askContext(interaction.channel, context, 'Please select the current context:');
 }
