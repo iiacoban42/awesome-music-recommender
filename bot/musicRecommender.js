@@ -39,8 +39,12 @@ module.exports = function (client, interaction) {
             // Check if we are done specifying the context
             interaction.channel.send(`Context selected ${JSON.stringify(context)}`);
             let context_name = context.name;
-            const url = await fetchMusic(activity_name, context_name);
-            interaction.channel.send(`Track URL ${JSON.stringify(url)}`);
+            try {
+                const url = await fetchMusic(activity_name, context_name);
+                interaction.channel.send(`Track URL ${JSON.stringify(url)}`);
+            } catch (e) {
+                console.log(e)
+            }
             return;
         } else {
             activity_name = context.name;
