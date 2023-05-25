@@ -23,7 +23,7 @@
 5. Run the server from the `backend/src` folder:
 `python manage.py runserver` The server runs on http://127.0.0.1:8000/
 
-6. To run the `backend/src`:
+6. Run the unit tests from `backend/src` with:
 `python manage.py test`
 
 - Alternatively, the server can run in a docker container with: `docker-compose up --build`
