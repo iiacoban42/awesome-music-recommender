@@ -8,7 +8,13 @@ let context = null;
 let activity_name = '';
 
 async function askContext(textChannel, context, question) {
-    const message = await textChannel.send(question);
+    let choices = '';
+    for (let emojiOption in context) {
+        choices += `${emojiOption} ${context[emojiOption].name} | `
+    }
+    choices = choices.slice(0, -3)
+
+    const message = await textChannel.send(`${question}\nUse the emojis under this message to interact\nChoices: ${choices}`);
     for (let emojiOption in context) {
         message.react(emojiOption);
     }
@@ -38,13 +44,13 @@ module.exports = function (client, interaction) {
 
         context = context[emoji];
 
-        if (!Object.keys(context).includes('contexts')) {
-            // Check if we are done specifying the context
+        message.delete();
+
+        if (!Object.keys(context).includes('contexts')) { // Check if we are done specifying the context
             if (activity_name == '') {
                 activity_name = context.name
             }
 
-            interaction.channel.send(`Context selected ${JSON.stringify(context)}`);
             let context_name = context.name;
             try {
                 const json_url = await fetchMusic(activity_name, context_name);
@@ -66,7 +72,7 @@ module.exports = function (client, interaction) {
                 voiceConnection.subscribe(player);
 
                 player.play(resource);
-                
+
                 player.on(AudioPlayerStatus.Idle, () => {
                     player.pause();
                     // player.play(getNextResource());
@@ -82,8 +88,9 @@ module.exports = function (client, interaction) {
 
         activity_name = context.name;
         context = context.contexts; // Narrow down the context further
-        askContext(interaction.channel, context, 'Specify the context further:');
+        askContext(interaction.channel, context, 'Please specify the context further: ');
     })
     context = contexts;
-    askContext(interaction.channel, context, 'Please select the current context:');
+
+    askContext(interaction.channel, context, 'Please select the current context: ');
 }
