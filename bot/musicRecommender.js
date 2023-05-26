@@ -1,7 +1,8 @@
 require('json5/lib/register');
+const { Events } = require('discord.js');
 const ytdl = require('ytdl-core');
 const contexts = require('./contexts.json5');
-const { createAudioPlayer, createAudioResource, joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
+const { createAudioPlayer, createAudioResource, getVoiceConnection, NoSubscriberBehavior, AudioPlayerStatus } = require('@discordjs/voice');
 
 let context = null;
 let activity_name = '';
@@ -23,7 +24,7 @@ async function fetchMusic(activity, context) {
 }
 
 module.exports = function (client, interaction) {
-    client.on('messageReactionAdd', async (reaction, user) => {
+    client.on(Events.MessageReactionAdd, async (reaction, user) => {
         if (user.bot) return; // Ignore reactions from bots
 
         const message = reaction.message;
@@ -39,7 +40,7 @@ module.exports = function (client, interaction) {
 
         if (!Object.keys(context).includes('contexts')) {
             // Check if we are done specifying the context
-            if (activity_name == ''){
+            if (activity_name == '') {
                 activity_name = context.name
             }
 
@@ -47,26 +48,31 @@ module.exports = function (client, interaction) {
             let context_name = context.name;
             try {
                 const json_url = await fetchMusic(activity_name, context_name);
-                interaction.channel.send(`Track URL ${json_url.url}`);
 
-                const connection = getVoiceConnection({
-                    guildId: interaction.guild.id,
-                })
-
-                // const voiceConnection = joinVoiceChannel({
-                //     channelId: interaction.id,
-                //     guildId: interaction.guild.id,
-                //     adapterCreator: interaction.guild.voiceAdapterCreator,
-                // });
+                const voiceConnection = getVoiceConnection(interaction.guildId)
+                if (!voiceConnection) {
+                    interaction.channel.send('Not in a voice channel please use /join');
+                    return;
+                }
 
                 const stream = ytdl(json_url.url, { filter: 'audioonly' });
                 const resource = createAudioResource(stream);
-                const player = createAudioPlayer();
+                const player = createAudioPlayer({
+                    behaviors: {
+                        noSubscriber: NoSubscriberBehavior.Pause,
+                    },
+                });
 
-                connection.subscribe(player);
+                voiceConnection.subscribe(player);
+
                 player.play(resource);
+                
+                player.on(AudioPlayerStatus.Idle, () => {
+                    player.pause();
+                    // player.play(getNextResource());
+                });
 
-                message.reply(`Now playing  ${json_url.url}!`);
+                interaction.channel.send(`Now playing  ${json_url.url}!`);
 
             } catch (e) {
                 console.log(e)
