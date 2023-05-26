@@ -46,7 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'home',
+    'websocket',
+    'django_filters',
 ]
 
 API_KEY_CUSTOM_HEADER = "HTTP_AUTHORIZATION"
@@ -81,7 +84,7 @@ TEMPLATES = [
 
 ASGI_APPLICATION = 'pickmeup.asgi.application'
 
-WSGI_APPLICATION = 'pickmeup.wsgi.application'
+# WSGI_APPLICATION = 'pickmeup.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
