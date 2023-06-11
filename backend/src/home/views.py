@@ -52,8 +52,8 @@ def get_new_track(request, activity, context=None):
             return HttpResponseBadRequest()
 
 
-def get_new_playlist(request, context, preferences):
-    blend = blend_playlist(context, preferences, intersect=True)
+def get_new_playlist(request, context, preferences, exclude_genres):
+    blend = blend_playlist(context, preferences, exclude_genres_list=exclude_genres)
     yt_urls = find_youtube_urls_of_spotify_playlist(blend)
-    
+
     return JsonResponse({"urls": yt_urls})

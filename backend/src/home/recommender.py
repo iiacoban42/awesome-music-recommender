@@ -99,12 +99,25 @@ def merge_preferences(preferences_list: list, intersect: bool) -> set:
     return merged_preferred_genres
 
 
-def blend_playlist(context: str, preferences_list: list, intersect: bool=True, shuffle: bool=False) ->list:
-    blended_playlist = []
-    merged_preferred_genres = merge_preferences(preferences_list, intersect)
+def exclude_genres(preference_list: set, exclude_genres_lists: list) -> set:
 
+    for lst in exclude_genres_lists:
+        preference_list.difference_update(lst)
+
+    return preference_list
+
+
+def blend_playlist(context: str, preferences_list: list, exclude_genres_lists: list=[], intersect: bool=False, shuffle: bool=True) ->list:
+    blended_playlist = []
+
+    # Merge genre preferences of all users
+    merged_preferred_genres = merge_preferences(preferences_list, intersect)
     if len(merged_preferred_genres) == 0:
         merged_preferred_genres = merge_preferences(preferences_list, False)
+
+    # Exclude genres users don't want to listen to
+    if exclude_genres_lists != [] or exclude_genres_lists is not None:
+        merged_preferred_genres = exclude_genres(merged_preferred_genres, exclude_genres_lists)
 
     # Merge context specific playlists for each genre
     for genre in merged_preferred_genres:
@@ -134,7 +147,7 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
     return youtube_urls_playlist
 
 
-blend = blend_playlist("study", [["lo-fi"], ["classical", "lo-fi"]], intersect=False)
-print(blend)
-yt_urls = find_youtube_urls_of_spotify_playlist(blend)
-print(yt_urls)
+# blend = blend_playlist("study", [["lo-fi"], ["classical", "lo-fi"]], intersect=False)
+# print(blend)
+# yt_urls = find_youtube_urls_of_spotify_playlist(blend)
+# print(yt_urls)
