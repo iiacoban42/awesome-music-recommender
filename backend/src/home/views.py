@@ -2,6 +2,8 @@
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 
+from .recommender import blend_playlist, find_youtube_urls_of_spotify_playlist
+
 
 def home(request):
     """Render index.html page"""
@@ -48,3 +50,10 @@ def get_new_track(request, activity, context=None):
             return  JsonResponse(recommend_gaming_music(context))
         case _:
             return HttpResponseBadRequest()
+
+
+def get_new_playlist(request, context, preferences):
+    blend = blend_playlist(context, preferences, intersect=True)
+    yt_urls = find_youtube_urls_of_spotify_playlist(blend)
+    
+    return JsonResponse({"urls": yt_urls})

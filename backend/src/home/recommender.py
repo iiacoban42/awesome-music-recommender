@@ -103,6 +103,9 @@ def blend_playlist(context: str, preferences_list: list, intersect: bool=True, s
     blended_playlist = []
     merged_preferred_genres = merge_preferences(preferences_list, intersect)
 
+    if len(merged_preferred_genres) == 0:
+        merged_preferred_genres = merge_preferences(preferences_list, False)
+
     # Merge context specific playlists for each genre
     for genre in merged_preferred_genres:
         spotify_playlist = find_spotify_playlists(f"{genre} {context}")
@@ -129,3 +132,9 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
         youtube_urls_playlist.append(get_youtube_url(track, artist))
 
     return youtube_urls_playlist
+
+
+blend = blend_playlist("study", [["lo-fi"], ["classical", "lo-fi"]], intersect=False)
+print(blend)
+yt_urls = find_youtube_urls_of_spotify_playlist(blend)
+print(yt_urls)
