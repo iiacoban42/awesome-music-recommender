@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import random
 
 load_dotenv()
 
@@ -30,10 +31,10 @@ def get_youtube_url(song_title: str, artist_name: str) -> str:
     # Print the YouTube URL
     return youtube_url
 
-print(get_youtube_url("Never Gonna Give You Up", "Rick Astley"))
+# print(get_youtube_url("Never Gonna Give You Up", "Rick Astley"))
 
 
-def find_spotify_playlists(query):
+def find_spotify_playlists(query: str) -> list:
     # Define the scope of access for the Spotify API
     scope = "playlist-read-private"
 
@@ -81,5 +82,50 @@ def find_spotify_playlists(query):
     # Return the list of tuples
     return playlist_info
 
-tracks = find_spotify_playlists("lofi")
-print(tracks)
+# tracks = find_spotify_playlists("lofi")
+# print(tracks)
+
+def merge_preferences(preferences_list: list, intersect: bool) -> set:
+    if intersect:
+        # Intersect genre preferences
+        sets = [set(lst) for lst in preferences_list]
+        merged_preferred_genres = set.intersection(*sets)
+        return merged_preferred_genres
+
+    # Union genre preferences
+    sets = [set(lst) for lst in preferences_list]
+    merged_preferred_genres = set.union(*sets)
+
+    return merged_preferred_genres
+
+
+def blend_playlist(context: str, preferences_list: list, intersect: bool=True, shuffle: bool=False) ->list:
+    blended_playlist = []
+    merged_preferred_genres = merge_preferences(preferences_list, intersect)
+
+    # Merge context specific playlists for each genre
+    for genre in merged_preferred_genres:
+        spotify_playlist = find_spotify_playlists(f"{genre} {context}")
+        # Add playlist to the blended playlist
+        blended_playlist.extend(spotify_playlist)
+
+    # Remove duplicate tracks
+    blended_spotify_playlist = list(set(blended_playlist))
+
+    # shuffle merge playlist
+    if shuffle:
+        random.seed(42)
+        random.shuffle(blended_spotify_playlist)
+
+    # Return the new playlist
+    return blended_spotify_playlist
+
+
+def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
+    youtube_urls_playlist = []
+
+    # Save the youtube URL of each track
+    for track, artist, genre in spotify_playlist:
+        youtube_urls_playlist.append(get_youtube_url(track, artist))
+
+    return youtube_urls_playlist
