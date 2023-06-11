@@ -53,6 +53,7 @@ def get_new_track(request, activity, context=None):
 
 
 def get_new_playlist(request, context, preferences, exclude_genres):
+    """Create new playlist based on genres and context"""
     blend = blend_playlist(context, preferences, exclude_genres_list=exclude_genres)
     yt_urls = find_youtube_urls_of_spotify_playlist(blend)
 
