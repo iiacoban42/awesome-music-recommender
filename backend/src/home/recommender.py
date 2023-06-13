@@ -14,7 +14,6 @@ spotify_client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
 
 
 def get_youtube_url(song_title: str, artist_name: str) -> str:
-
     # Initialize the YouTube Data API
     youtube = build('youtube', 'v3', developerKey=youtube_api_key)
 
@@ -34,12 +33,10 @@ def get_youtube_url(song_title: str, artist_name: str) -> str:
 # print(get_youtube_url("Never Gonna Give You Up", "Rick Astley"))
 
 
-def find_spotify_playlists(query: str) -> list:
-    # Define the scope of access for the Spotify API
-    scope = "playlist-read-private"
-
-    # Set up the Spotify API client
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
+def find_spotify_playlists(query: str, sp=None) -> list:
+    if sp is None:
+        scope = "playlist-read-private"
+        sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
                                                    client_id=spotify_client_id,
                                                    client_secret=spotify_client_secret,
                                                    redirect_uri="http://localhost:8000"
@@ -47,7 +44,7 @@ def find_spotify_playlists(query: str) -> list:
                          )
 
     # Search for playlists
-    results = sp.search(q=query, type='playlist', limit=5)
+    results = sp.search(q=query, type='playlist', limit=1)
 
     # Retrieve the first playlist's URI
     playlist_uri = results['playlists']['items'][0]['uri']
@@ -66,7 +63,7 @@ def find_spotify_playlists(query: str) -> list:
 
         # Retrieve the artist's information
         artist_info = sp.artist(track['artists'][0]['id'])
-        genres = artist_info['genres']
+        genres = tuple(artist_info['genres'])
 
         # Store the track, artist, and genres information in the list as a tuple
         playlist_info.append((track_name, artist, genres))
@@ -82,8 +79,6 @@ def find_spotify_playlists(query: str) -> list:
     # Return the list of tuples
     return playlist_info
 
-# tracks = find_spotify_playlists("lofi")
-# print(tracks)
 
 def merge_preferences(preferences_list: list, intersect: bool) -> set:
     if intersect:
@@ -100,7 +95,6 @@ def merge_preferences(preferences_list: list, intersect: bool) -> set:
 
 
 def exclude_genres(preference_list: set, exclude_genres_lists: list) -> set:
-
     for lst in exclude_genres_lists:
         preference_list.difference_update(lst)
 
@@ -126,7 +120,8 @@ def blend_playlist(context: str, preferences_list: list, exclude_genres_lists: l
         blended_playlist.extend(spotify_playlist)
 
     # Remove duplicate tracks
-    blended_spotify_playlist = list(set(blended_playlist))
+    blended_playlist_set = set(blended_playlist)
+    blended_spotify_playlist = list(blended_playlist_set)
 
     # shuffle merge playlist
     if shuffle:
@@ -147,7 +142,11 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
     return youtube_urls_playlist
 
 
-# blend = blend_playlist("study", [["lo-fi"], ["classical", "lo-fi"]], intersect=False)
+# blend = blend_playlist("study", [["rock"], ["pop"]], intersect=False)
 # print(blend)
 # yt_urls = find_youtube_urls_of_spotify_playlist(blend)
 # print(yt_urls)
+
+
+# tracks = find_spotify_playlists("lofi")
+# print(tracks)
