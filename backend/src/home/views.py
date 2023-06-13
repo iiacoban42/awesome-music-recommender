@@ -2,7 +2,7 @@
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 
-from .recommender import blend_playlist, find_youtube_urls_of_spotify_playlist
+from .recommender import blend_playlist, find_youtube_urls_of_spotify_playlist, get_youtube_url
 
 
 def home(request):
@@ -55,6 +55,12 @@ def get_new_track(request, activity, context=None):
 def get_new_playlist(request, context, preferences, exclude_genres):
     """Create new playlist based on genres and context"""
     blend = blend_playlist(context, preferences, exclude_genres_list=exclude_genres)
-    yt_urls = find_youtube_urls_of_spotify_playlist(blend)
 
-    return JsonResponse({"urls": yt_urls})
+    return JsonResponse({"playlist_blend": blend})
+
+
+def get_track_youtube_url(request, track, artist):
+    """Query the google API to find track on youtube"""
+    url = get_youtube_url(track, artist)
+
+    return JsonResponse({"url": url})

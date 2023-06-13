@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import random
+from time import time
 
 load_dotenv()
 
@@ -136,8 +137,13 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
     youtube_urls_playlist = []
 
     # Save the youtube URL of each track
+    i = 0
     for track, artist, genre in spotify_playlist:
+        if i == 10:
+            # Sleep to fulfil Google API quota requirements
+            time.sleep(1)
         youtube_urls_playlist.append(get_youtube_url(track, artist))
+        i = i + 1
 
     return youtube_urls_playlist
 
@@ -146,7 +152,3 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
 # print(blend)
 # yt_urls = find_youtube_urls_of_spotify_playlist(blend)
 # print(yt_urls)
-
-
-# tracks = find_spotify_playlists("lofi")
-# print(tracks)
