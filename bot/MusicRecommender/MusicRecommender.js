@@ -10,15 +10,30 @@ const {
   AudioPlayerStatus
 } = require('@discordjs/voice')
 
-async function fetchMusic (activity, context) {
+async function fetchMusic () {
   try {
     let response = await fetch(
-      `http://127.0.0.1:8000/get-new-track/${activity}/${context}/`
+      `http://localhost:8000/get-yt-url/<track>/<artist>/`
     )
     return response.json()
   } catch (e) {
     console.log(e)
   }
+}
+
+async function fetchPlaylist (data) {
+    try{
+        let response = await fetch(
+            `http://localhost:8000/get-new-playlist/`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+        )
+    }
 }
 
 module.exports = class MusicRecommender {
@@ -30,16 +45,16 @@ module.exports = class MusicRecommender {
     this.preferenceManager = preferenceManager
 
     this.voiceConnection = getVoiceConnection(guild.id)
-    this.contextObj = contexts
+    this.context = contexts
 
     this.askContext('Please select the current context: ')
   }
 
   async askContext (question) {
-    let emojiOptions = Object.keys(this.contextObj)
+    let emojiOptions = Object.keys(this.context)
 
     let choices = emojiOptions
-      .map(emojiOption => `${emojiOption} ${this.contextObj[emojiOption].name}`)
+      .map(emojiOption => `${emojiOption} ${this.context[emojiOption].name}`)
       .join(' | ')
 
     const message = await this.textChannel.send(
@@ -59,15 +74,15 @@ Choices: ${choices}`
 
     message.delete()
 
-    this.contextObj = this.contextObj[emoji]
+    this.context = this.context[emoji]
 
-    if (!Object.keys(this.contextObj).includes('contexts')) {
+    if (!Object.keys(this.context).includes('contexts')) {
       // Check if we are done specifying the context
       this.playMusic()
       return
     }
 
-    this.contextObj = this.contextObj.contexts // Narrow down the context further
+    this.context = this.context.contexts // Narrow down the context further
     this.askContext('Please specify the context further: ')
   }
 
@@ -77,25 +92,28 @@ Choices: ${choices}`
       .filter(member => !member.bot)
     const preferences = await this.preferenceManager.getPreferences(
       members,
-      this.contextObj
+      this.context
     )
 
+    const context_and_preferences = preferences
+    context_and_preferences['context'] = this.context.name
     console.log(preferences)
+    console.log(context_and_preferences)
 
-    // const jsonUrl = await fetchMusic(
-    //   this.contextList[0],
-    //   this.contextList[1],
-    //   preferences
-    // )
+    this.playlist = fetchPlaylist(context_and_preferences)
+  }
 
-    // const stream = ytdl(jsonUrl.url, { filter: 'audioonly' })
-    // const resource = createAudioResource(stream)
+  async playNextSong() {
+    const jsonUrl = await fetchMusic()
 
-    // const player = this.getPlayer()
+    const stream = ytdl(jsonUrl.url, { filter: 'audioonly' })
+    const resource = createAudioResource(stream)
 
-    // player.play(resource)
+    const player = this.getPlayer()
 
-    // interaction.channel.send(`Now playing  ${jsonUrl.url}!`)
+    player.play(resource)
+
+    interaction.channel.send(`Now playing  ${jsonUrl.url}!`)
   }
 
   async getPlayer () {
@@ -109,7 +127,7 @@ Choices: ${choices}`
 
     this._player.on(AudioPlayerStatus.Idle, () => {
       this._player.pause()
-      this.playMusic()
+      this.playNextSong()
     })
 
     return this._player
@@ -121,9 +139,6 @@ Choices: ${choices}`
       connection.destroy()
     } catch (error) {
       console.error(`Failed to leave the voice channel: ${error}`)
-      await interaction.reply(
-        'Failed to leave the voice channel. Please try again later.'
-      )
     }
   }
 }

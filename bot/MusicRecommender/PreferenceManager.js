@@ -44,7 +44,7 @@ module.exports = class PreferenceManager {
   }
 
   // Function to get the preferences
-  getPreferences (members, contextObj) {
+  getPreferences (members, context) {
     // Keep track of the number of members we have preferences for
     let resolvedCount = 0
 
@@ -63,44 +63,45 @@ module.exports = class PreferenceManager {
         .map(member => {
           // If we already have an answer for a member use that, else request their likes and dislikes
           const promise = new Promise((resolve, reject) => {
-            let userPreference = this.preferences[member.userId]
+            let userPreference = this.preferences[member.id]
             if (!userPreference) {
               userPreference = {}
               this.preferences[member.id] = userPreference
             }
-            const contextPreference = userPreference[contextObj.name]
+            const contextPreference = userPreference[context.name]
             if (contextPreference) {
               return resolve(contextPreference)
             }
-            this.requestPreferences(member, contextObj, resolve)
+            this.requestPreferences(member, context, resolve)
           })
           return {
             promise,
             member
           }
         })
-        .forEach(({ promise, member }) => {
+        .forEach(async ({ promise, member }) => {
           // Once a promise resolves store its contents and upon receiving all answers resolve the main promise and save to disk
-          Promise.resolve(promise)
-            .then(preferences => {
-              resolvedCount++
-              this.preferences[member.id][contextObj.name] = preferences
+          const preferences = await promise
+          resolvedCount++
+          this.preferences[member.id][context.name] = preferences
 
-              if (resolvedCount === members.length) {
-                this.writePreferences()
-                resolve({
-                    likes: members.map(member => this.preferences[member.id][contextObj.name].likes),
-                    dislikes: members.map(member => this.preferences[member.id][contextObj.name].dislikes),
-                })
-              }
+          if (resolvedCount === members.length) {
+            this.writePreferences()
+            resolve({
+              likes: members.map(
+                member => this.preferences[member.id][context.name].likes
+              ),
+              dislikes: members.map(
+                member => this.preferences[member.id][context.name].dislikes
+              )
             })
-            .catch(reject)
+          }
         })
     })
   }
 
   // Function to request the preferences from a user
-  async requestPreferences (member, contextObj, resolve) {
+  async requestPreferences (member, context, resolve) {
     console.log(`Requesting preferences from ${member.username}`)
 
     // Create/Get a direct message channel with the user
@@ -115,7 +116,7 @@ module.exports = class PreferenceManager {
     })
 
     // Map possible genres with an emoji
-    const genreEmojis = contextObj.genres.map((genre, i) => [
+    const genreEmojis = context.genres.map((genre, i) => [
       genre,
       numberEmojis[i + 1]
     ])
@@ -134,7 +135,7 @@ module.exports = class PreferenceManager {
 
     // Request the likes and append emojis
     message = await dm.send(
-      `What are your prefered musical genres for ${contextObj.name}?
+      `What are your prefered musical genres for ${context.name}?
 Use the emojis under this message to interact
 Choices: ${choices}
 Press ${confirmEmoji} to confirm your choices`
@@ -161,7 +162,7 @@ Press ${confirmEmoji} to confirm your choices`
 
     // Request the dislikes and append emojis
     message = await dm.send(
-      `What are your disliked musical genres for ${contextObj.name}?
+      `What are your disliked musical genres for ${context.name}?
 Use the emojis under this message to interact
 Choices: ${choices}
 Press ${confirmEmoji} to confirm your choices`
