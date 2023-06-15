@@ -10,10 +10,10 @@ const {
   AudioPlayerStatus
 } = require('@discordjs/voice')
 
-async function fetchMusic () {
+async function fetchMusic (track, artist) {
   try {
     let response = await fetch(
-      `http://localhost:8000/get-yt-url/<track>/<artist>/`
+      `http://127.0.0.1:8000/get-yt-url/${track}/${artist}/`
     )
     return response.json()
   } catch (e) {
@@ -23,15 +23,15 @@ async function fetchMusic () {
 
 async function fetchPlaylist (data) {
   try {
-    let response = await fetch(`http://localhost:8000/get-new-playlist/`, {
+    let response = await fetch(`http://127.0.0.1:8000/get-new-playlist/`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     })
-    console.log(response)
     return response.json()
   } catch (e) {
     console.error(e)
@@ -99,39 +99,44 @@ Choices: ${choices}`
 
     const context_and_preferences = preferences
     context_and_preferences['context'] = this.context.name
-    console.log(preferences)
     console.log(context_and_preferences)
 
-    this.playlist = await fetchPlaylist(context_and_preferences)
-    console.log(this.playlist)
+    const response = await fetchPlaylist(context_and_preferences)
+    this.playlist = response.playlist_blend
+    this.playNextSong()
   }
 
   async playNextSong () {
-    const jsonUrl = await fetchMusic()
+    // Request the url for the next song in the playlist
+    const [track, artist, _] = this.playlist.shift()
+    const jsonUrl = await fetchMusic(track, artist)
 
-    const stream = ytdl(jsonUrl.url, { filter: 'audioonly' })
+    // Get the resource
+    const stream = ytdl(jsonUrl.url, { filter: 'audioonly', highWaterMark: 1 << 25 })
     const resource = createAudioResource(stream)
 
-    const player = this.getPlayer()
-
+    // Play the song
+    const player = await this.getPlayer()
     player.play(resource)
-
-    interaction.channel.send(`Now playing  ${jsonUrl.url}!`)
+    console.log(`Now playing ${track} - ${artist}`)
+    this.textChannel.send(`Now playing  ${jsonUrl.url}!`)
   }
 
   async getPlayer () {
     if (this._player) return this._player
-    const player = createAudioPlayer({
+    this._player = createAudioPlayer({
       behaviors: {
         noSubscriber: NoSubscriberBehavior.Pause
       }
     })
-    this.voiceConnection.subscribe(this._player)
+    this.voiceConnection.subscribe(this._player)  
 
     this._player.on(AudioPlayerStatus.Idle, () => {
       this._player.pause()
       this.playNextSong()
     })
+
+    this._player.on("error", console.error)
 
     return this._player
   }
