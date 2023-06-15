@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from collections import Counter
 import copy
+import itertools
 import json
 import pickle
 import random
@@ -113,17 +115,54 @@ def exclude_genres(preference_list: set, exclude_genres_lists: list) -> set:
     return preference_list
 
 
-def filter_playlist(blended_spotify_playlist: list, exclude_genres_lists: list) -> list:
-    # Remove excluded genres
-    copy_list = copy.deepcopy(blended_spotify_playlist)
-    for track, artist, genres in copy_list:
-        if set(exclude_genres_lists).intersection(set(genres)) != set():
-            blended_spotify_playlist.remove((track, artist, genres))
+def filter_playlist(blended_spotify_playlist: list, preferences_list: list, exclude_genres_lists: list) -> list:
+    # Flatten preferences lists
+    preferences_list_flattened = list(itertools.chain(*preferences_list))
+    exclude_genres_lists_flattened = list(itertools.chain(*exclude_genres_lists))
 
-    return blended_spotify_playlist
+    # Compute genres weight score
+    likes_counter = Counter(preferences_list_flattened)
+    dislikes_counter = Counter(exclude_genres_lists_flattened)
+
+    result = {}
+
+    for key in likes_counter:
+        if key in dislikes_counter:
+            result[key] = likes_counter[key] - dislikes_counter[key]
+        else:
+            result[key] = likes_counter[key]
+
+    for key in dislikes_counter:
+        if key not in likes_counter:
+            result[key] = -dislikes_counter[key]
+
+    for genre, frequency in result.items():
+        print(f"{genre}: {frequency}")
+
+    # Computer track preference score based on genres and filter out negative scores
+    filtered_playlist = []
+    for track, artist, genres in blended_spotify_playlist:
+        track_score = 0
+        for genre, genre_score in result.items():
+            if genre in genres:
+                track_score = track_score + genre_score
+        if track_score >= 0:
+            filtered_playlist.append(tuple((track_score, track, artist, genres)))
+
+    # Shuffle tracks that have the same score
+    # Group the tracks based on the score attribute
+    filtered_playlist = sorted(filtered_playlist, key=lambda x: x[0], reverse=True)
+    grouped = itertools.groupby(filtered_playlist, key=lambda x: x[0])
+    # Shuffle the windows of elements with the same score
+    shuffled_list = []
+    for _, group in grouped:
+        tracks = list(group)
+        random.shuffle(tracks)
+        shuffled_list.extend(tracks)
+    return shuffled_list
 
 
-def blend_playlist_local(context: str, preferences_list: list=[], exclude_genres_lists: list=[], shuffle: bool=True):
+def blend_playlist_curated(context: str, preferences_list: list, exclude_genres_lists: list) -> list:
 
     # Open the file and load the JSON data
     with open('home/playlists.json', 'r', encoding='UTF-8') as file:
@@ -153,20 +192,11 @@ def blend_playlist_local(context: str, preferences_list: list=[], exclude_genres
     blended_playlist_set = set(blended_playlist)
     blended_spotify_playlist = list(blended_playlist_set)
 
-    # Filter unwanted genres
-    blended_playlist = filter_playlist(blended_playlist, exclude_genres_lists)
-
-    # shuffle merge playlist
-    if shuffle:
-        random.seed(42)
-        random.shuffle(blended_spotify_playlist)
-
-    # Return the new playlist
-    return blended_spotify_playlist
+    # Filter unwanted genres and return playlist
+    return filter_playlist(blended_spotify_playlist, preferences_list, exclude_genres_lists)
 
 
-
-def blend_playlist(context: str, preferences_list: list, exclude_genres_lists: list=[], intersect: bool=False, shuffle: bool=True) ->list:
+def blend_playlist_dynamic(context: str, preferences_list: list, exclude_genres_lists: list=[], intersect: bool=False, shuffle: bool=True) ->list:
     blended_playlist = []
 
     # Merge genre preferences of all users
@@ -217,4 +247,5 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
 # yt_urls = find_youtube_urls_of_spotify_playlist(blend)
 # print(yt_urls)
 
-# print(blend_playlist_local("Designing"))
+# blend_playlist_curated("Designing", [['rock']], [['pop']])
+# print(blend_playlist_curated("Designing", [['classical']], [[]]))

@@ -5,7 +5,7 @@ import json
 import os
 import pickle
 
-from .recommender import blend_playlist, get_youtube_url, blend_playlist_local
+from .recommender import  get_youtube_url, blend_playlist_curated
 
 
 def home(request):
@@ -63,7 +63,9 @@ def get_new_playlist(request):
     preferences = json_input['likes']
     exclude_genres = json_input['dislikes']
 
-    blend = blend_playlist_local(context, preferences, exclude_genres)
+    print(json_input)
+
+    blend = blend_playlist_curated(context, preferences, exclude_genres)
 
     return JsonResponse({"playlist_blend": blend})
 
