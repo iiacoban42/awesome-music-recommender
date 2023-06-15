@@ -17,23 +17,25 @@ async function fetchMusic () {
     )
     return response.json()
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
 async function fetchPlaylist (data) {
-    try{
-        let response = await fetch(
-            `http://localhost:8000/get-new-playlist/`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            }
-        )
-    }
+  try {
+    let response = await fetch(`http://localhost:8000/get-new-playlist/`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    console.log(response)
+    return response.json()
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 module.exports = class MusicRecommender {
@@ -100,10 +102,11 @@ Choices: ${choices}`
     console.log(preferences)
     console.log(context_and_preferences)
 
-    this.playlist = fetchPlaylist(context_and_preferences)
+    this.playlist = await fetchPlaylist(context_and_preferences)
+    console.log(this.playlist)
   }
 
-  async playNextSong() {
+  async playNextSong () {
     const jsonUrl = await fetchMusic()
 
     const stream = ytdl(jsonUrl.url, { filter: 'audioonly' })
