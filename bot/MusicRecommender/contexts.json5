@@ -1,3 +1,4 @@
+// The context specification tree, the bot will narrow these down to a final leaf using question messages and emoji options in `MusicRecommender.js`
 {
   '🎮': {
     name: 'Gaming',

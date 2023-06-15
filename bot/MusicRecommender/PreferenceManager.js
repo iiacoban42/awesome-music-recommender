@@ -1,3 +1,4 @@
+// Manages the preferences, if needed requests them from users, if already stored on disk used those
 const fs = require('fs')
 const preferencesFile = './data/preferences.json'
 const { Events } = require('discord.js')
@@ -140,10 +141,12 @@ Use the emojis under this message to interact
 Choices: ${choices}
 Press ${confirmEmoji} to confirm your choices`
     )
+
     genreEmojis.forEach(
-      async ([_, emojiOption]) => await message.react(emojiOption)
+      async ([_, emojiOption]) =>
+        await message.react(emojiOption).catch(() => {})
     )
-    await message.react(confirmEmoji)
+    await message.react(confirmEmoji).catch(() => {})
 
     // Wait for the confirmation emoji
     console.log(`Waiting for ${member.username} to input likes`)
