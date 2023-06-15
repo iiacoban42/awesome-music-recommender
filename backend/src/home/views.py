@@ -1,6 +1,9 @@
 """API request handling. Map requests to the corresponding HTMLs."""
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
+import json
+
+from .recommender import blend_playlist, get_youtube_url
 
 
 def home(request):
@@ -48,3 +51,23 @@ def get_new_track(request, activity, context=None):
             return  JsonResponse(recommend_gaming_music(context))
         case _:
             return HttpResponseBadRequest()
+
+
+def get_new_playlist(request):
+    """Create new playlist based on genres and context"""
+
+    json_input = json.loads(request.body)
+    context = json_input['context']
+    preferences = json_input['likes']
+    exclude_genres = json_input['dislikes']
+
+    blend = blend_playlist(context, preferences, exclude_genres)
+
+    return JsonResponse({"playlist_blend": blend})
+
+
+def get_track_youtube_url(request, track, artist):
+    """Query the google API to find track on youtube"""
+    url = get_youtube_url(track, artist)
+
+    return JsonResponse({"url": url})

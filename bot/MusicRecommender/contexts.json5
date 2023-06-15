@@ -1,0 +1,62 @@
+{
+  '🎮': {
+    name: 'gaming',
+    contexts: {
+      '💥': {
+        name: 'action',
+        contexts: {
+          '🔫': {
+            name: 'fps',
+            genres: ['Easy listening', 'Dance', 'Pop']
+          },
+          '❌': {
+            name: 'default',
+            genres: ['HipHop', 'Rock', 'Latin']
+          }
+        }
+      },
+      '🎲': {
+        name: 'casual',
+        genres: ['Dance/Electronic', 'Pop', 'Rock']
+      }
+    }
+  },
+  '📔': {
+    name: 'studying/working',
+    contexts: {
+      '🎓': {
+        name: 'studying for exam',
+        genres: ['New age', 'Classical', 'Dance/Electronic']
+      },
+      '👾': {
+        name: 'coding',
+        genres: ['Dance Electronic', 'New age', 'Rock']
+      },
+      '🖼️': {
+        name: 'designing',
+        genres: ['Classical', 'Pop', 'Rock']
+      }
+    }
+  },
+  '🗨️': {
+    name: 'just chatting',
+    genres: ['Dance/Electronic', 'Jazz', 'Latin']
+  },
+  '🏅': {
+    name: 'sporting',
+    contexts: {
+      '🏋️': {
+        name: 'workout',
+        genres: ['Dance/Electronic', 'Pop', 'R&B']
+      },
+      '🏃': {
+        name: 'cardio',
+        genres: ['Hip Hop', 'R&B', 'Pop']
+      },
+      '💃': {
+        name: 'dancing',
+        genres: ['Dance/Electronic', 'Pop', 'R&B']
+      }
+    }
+  }
+}
