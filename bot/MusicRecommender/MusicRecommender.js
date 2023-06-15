@@ -108,17 +108,20 @@ Choices: ${choices}`
 
   async playNextSong () {
     // Request the url for the next song in the playlist
-    const [track, artist, _] = this.playlist.shift()
+    const [score, track, artist] = this.playlist.shift()
     const jsonUrl = await fetchMusic(track, artist)
 
     // Get the resource
-    const stream = ytdl(jsonUrl.url, { filter: 'audioonly', highWaterMark: 1 << 25 })
+    const stream = ytdl(jsonUrl.url, {
+      filter: 'audioonly',
+      highWaterMark: 1 << 25
+    })
     const resource = createAudioResource(stream)
 
     // Play the song
     const player = await this.getPlayer()
     player.play(resource)
-    console.log(`Now playing ${track} - ${artist}`)
+    console.log(`Now playing ${track} - ${artist} (${score})`)
     this.textChannel.send(`Now playing  ${jsonUrl.url}!`)
   }
 
@@ -129,14 +132,14 @@ Choices: ${choices}`
         noSubscriber: NoSubscriberBehavior.Pause
       }
     })
-    this.voiceConnection.subscribe(this._player)  
+    this.voiceConnection.subscribe(this._player)
 
     this._player.on(AudioPlayerStatus.Idle, () => {
       this._player.pause()
       this.playNextSong()
     })
 
-    this._player.on("error", console.error)
+    this._player.on('error', console.error)
 
     return this._player
   }
