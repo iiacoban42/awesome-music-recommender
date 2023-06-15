@@ -17,8 +17,9 @@ The "pick-me-up" project introduces a Discord bot that creates personalized musi
 TOKEN="OBTAIN TOKEN FROM DISCORD DEVELOPER PORTAL"
 CLIENT_ID="OBTAIN CLIENT ID FROM DISCORD DEVELOPER PORTAL"
 
-2. Run `npm start`
-3. Enter `/join` in the Discord server text channel
+3. Run `npm install`
+4. Run `npm start`
+5. Enter `/join` in the Discord server text channel
 
 
 ## Setup Django server

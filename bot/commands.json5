@@ -1,7 +1,12 @@
+// The commands used by the discord bot, these are registered in `registercommands.js`
 [
     {
         name: "join",
         description: "Connects the bot to the users voice channel and start recommending music!",
+    },
+    {
+        name: "skip",
+        description: "Skips the song thats currently playing",
     },
     {
         name: "leave",

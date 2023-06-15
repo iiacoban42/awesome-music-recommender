@@ -1,60 +1,61 @@
+// The context specification tree, the bot will narrow these down to a final leaf using question messages and emoji options in `MusicRecommender.js`
 {
   '🎮': {
-    name: 'gaming',
+    name: 'Gaming',
     contexts: {
       '💥': {
-        name: 'action',
+        name: 'Action',
         contexts: {
           '🔫': {
-            name: 'fps',
+            name: 'FPS',
             genres: ['Easy listening', 'Dance', 'Pop']
           },
           '❌': {
-            name: 'default',
+            name: 'Action',
             genres: ['HipHop', 'Rock', 'Latin']
           }
         }
       },
       '🎲': {
-        name: 'casual',
+        name: 'Casual',
         genres: ['Dance/Electronic', 'Pop', 'Rock']
       }
     }
   },
   '📔': {
-    name: 'studying/working',
+    name: 'Working',
     contexts: {
       '🎓': {
-        name: 'studying for exam',
+        name: 'Studying',
         genres: ['New age', 'Classical', 'Dance/Electronic']
       },
       '👾': {
-        name: 'coding',
+        name: 'Coding',
         genres: ['Dance Electronic', 'New age', 'Rock']
       },
       '🖼️': {
-        name: 'designing',
+        name: 'Designing',
         genres: ['Classical', 'Pop', 'Rock']
       }
     }
   },
   '🗨️': {
-    name: 'just chatting',
+    name: 'Chatting',
     genres: ['Dance/Electronic', 'Jazz', 'Latin']
   },
   '🏅': {
-    name: 'sporting',
+    name: 'Sporting',
     contexts: {
       '🏋️': {
-        name: 'workout',
+        name: 'Workout',
         genres: ['Dance/Electronic', 'Pop', 'R&B']
       },
       '🏃': {
-        name: 'cardio',
+        name: 'Cardio',
         genres: ['Hip Hop', 'R&B', 'Pop']
       },
       '💃': {
-        name: 'dancing',
+        name: 'Dancing',
         genres: ['Dance/Electronic', 'Pop', 'R&B']
       }
     }
