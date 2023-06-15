@@ -1,0 +1,66 @@
+{
+    "Action": [
+        "https://open.spotify.com/playlist/37i9dQZF1DX6RSJAsEDz7H?si=254f321b90c84fdc"],
+    "FPS": [
+        "https://open.spotify.com/playlist/37i9dQZF1DWYRYaqBHPt12?si=33fd2b214ed249ac",
+        "https://open.spotify.com/playlist/37i9dQZF1DX7fPai8IXlgh?si=879f5b788ef445e3"],
+
+    "Casual": [
+        "https://open.spotify.com/playlist/37i9dQZF1DX4geSlFB9288?si=7fe12f6dd8b84b10",
+        "https://open.spotify.com/playlist/37i9dQZF1DX1bJXtym592H?si=adff321d9e894b7b",
+        "https://open.spotify.com/playlist/37i9dQZF1DZ06evO3JmuZ2?si=8c1097ad786b4385",
+        "https://open.spotify.com/playlist/37i9dQZF1DWZk66p51QrCM?si=fa4043c23dda49a7",
+        "https://open.spotify.com/playlist/37i9dQZF1DX4vgOVqe6BJn?si=b4e833b1e0c64439",
+        "https://open.spotify.com/playlist/37i9dQZF1DWTMWIpgAlsRJ?si=42a8354154524341",
+        "https://open.spotify.com/playlist/37i9dQZF1DXdLEN7aqioXM?si=a8129d535e7c4bb9",
+        "https://open.spotify.com/playlist/37i9dQZF1DWYnY33e7En9e?si=b368192551ae4610"
+    ],
+
+    "Studying": [
+        "https://open.spotify.com/playlist/37i9dQZF1DX9sIqqvKsjG8?si=ba6e968219a94af7",
+        "https://open.spotify.com/playlist/37i9dQZF1DX9j444F9NCBa?si=10a038ce955b4bc5",
+        "https://open.spotify.com/playlist/37i9dQZF1DX7hmlhGsyxU0?si=5afd70d0a33b4075",
+        "https://open.spotify.com/playlist/37i9dQZF1DX8NMUtC3b3gL?si=fa20fc0a472a4184",
+        "https://open.spotify.com/playlist/37i9dQZF1DX8Uebhn9wzrS?si=23857cfdb56f4bb7"
+    ],
+
+    "Coding": [
+        "https://open.spotify.com/playlist/37i9dQZF1DX5trt9i14X7j?si=3c81b39ec12c4f7d",
+        "https://open.spotify.com/playlist/37i9dQZF1EId5SvHK2QYmJ?si=96cac3c196554bfa",
+        "https://open.spotify.com/playlist/37i9dQZF1EIeqXPhbD94TJ?si=ccaf606380104a86",
+        "https://open.spotify.com/playlist/37i9dQZF1EIhEi7Pkk9bp6?si=cf19aea5c2684cbf"
+    ],
+
+
+    "Designing":[
+        "https://open.spotify.com/playlist/37i9dQZF1EIdZbdjKGQLUA?si=3ccd6841c18d4cf8",
+        "https://open.spotify.com/playlist/37i9dQZF1DX56qfiUZBncF?si=c7173b7a6d5e493f",
+        "https://open.spotify.com/playlist/37i9dQZF1DWWn6teJIIcfG?si=ebf150bacafd4f67"
+    ],
+
+    "Chatting": [
+        "https://open.spotify.com/playlist/37i9dQZF1DX0khTY3HFA4M?si=c5a73fcbdb1742a5",
+        "https://open.spotify.com/playlist/37i9dQZF1DX8f5qTGj8FYl?si=5a701657375745b5",
+        "https://open.spotify.com/playlist/37i9dQZF1DX8NMUtC3b3gL?si=fa20fc0a472a4184"
+    ],
+
+    "Sporting": [
+        "https://open.spotify.com/playlist/37i9dQZF1DX32NsLKyzScr?si=2ef2200875d24794",
+        "https://open.spotify.com/playlist/37i9dQZF1DX0HRj9P7NxeE?si=dd1eb5d041ee447a",
+        "https://open.spotify.com/playlist/37i9dQZF1DXadOVCgGhS7j?si=5f7b164eab734524",
+        "https://open.spotify.com/playlist/37i9dQZF1DWWPcvnOpPG3x?si=9d189ab0210c4791"
+    ],
+
+    "Workout":[
+        "https://open.spotify.com/playlist/37i9dQZF1DXe6bgV3TmZOL?si=080fafc8c6e94064",
+        "https://open.spotify.com/playlist/37i9dQZF1DX35UmSKx1jwI?si=6a481dc21f974115",
+        "https://open.spotify.com/playlist/37i9dQZF1DX73EtbU4jEcn?si=4d4fafca4e424f8a",
+        "https://open.spotify.com/playlist/37i9dQZF1EIcBvJ5NboF6b?si=13ab1c62f7064f56"
+    ],
+
+    "Dance": [
+        "https://open.spotify.com/playlist/37i9dQZF1DXdURFimg6Blm?si=a3a77eb63a2d4d47",
+        "https://open.spotify.com/playlist/37i9dQZF1DXaXB8fQg7xif?si=bbf0ca7b1e8e4477",
+        "https://open.spotify.com/playlist/37i9dQZF1DX8tZsk68tuDw?si=8d56f4f0d1aa4491"
+    ]
+}

@@ -3,7 +3,11 @@ import os
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import copy
+import json
+import pickle
 import random
+import re
 from time import time
 
 load_dotenv()
@@ -34,7 +38,10 @@ def get_youtube_url(song_title: str, artist_name: str) -> str:
 # print(get_youtube_url("Never Gonna Give You Up", "Rick Astley"))
 
 
-def find_spotify_playlists(query: str, sp=None) -> list:
+def find_spotify_playlists(query: str=None, sp=None, playlist_url=None) -> list:\
+
+    assert query is not None or playlist_url is not None
+
     if sp is None:
         scope = "playlist-read-private"
         sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
@@ -43,15 +50,19 @@ def find_spotify_playlists(query: str, sp=None) -> list:
                                                    redirect_uri="http://localhost:8000"
                                                    )
                          )
-
     # Search for playlists
-    results = sp.search(q=query, type='playlist', limit=1)
+    if playlist_url is not None:
+        # Extract the playlist ID from the URL
+        playlist_uri = re.search(r'playlist\/([\w\d]+)', playlist_url).group(1)
 
-    # Retrieve the first playlist's URI
-    playlist_uri = results['playlists']['items'][0]['uri']
+    elif query is not None:
+        results = sp.search(q=query, type='playlist', limit=1)
+        # Retrieve the first playlist's URI
+        playlist_uri = results['playlists']['items'][0]['uri']
 
     # Retrieve the playlist's tracks
     results = sp.playlist_tracks(playlist_uri)
+    print(results)
 
     # Create an empty list to store the track, artist, and genres information
     playlist_info = []
@@ -100,6 +111,59 @@ def exclude_genres(preference_list: set, exclude_genres_lists: list) -> set:
         preference_list.difference_update(lst)
 
     return preference_list
+
+
+def filter_playlist(blended_spotify_playlist: list, exclude_genres_lists: list) -> list:
+    # Remove excluded genres
+    copy_list = copy.deepcopy(blended_spotify_playlist)
+    for track, artist, genres in copy_list:
+        if set(exclude_genres_lists).intersection(set(genres)) != set():
+            blended_spotify_playlist.remove((track, artist, genres))
+
+    return blended_spotify_playlist
+
+
+def blend_playlist_local(context: str, preferences_list: list=[], exclude_genres_lists: list=[], shuffle: bool=True):
+
+    # Open the file and load the JSON data
+    with open('backend/src/home/playlists.json', 'r', encoding='UTF-8') as file:
+        playlist_library = json.load(file)
+
+    if context not in playlist_library:
+        return []
+
+    playlists = playlist_library[context]
+
+    cached_playlist_file_path = f'backend/src/home/cached/{context}.pickle'
+    # Check if the playlist is cached
+    if os.path.exists(cached_playlist_file_path):
+        with open(cached_playlist_file_path, 'rb') as file:
+            blended_playlist = pickle.load(file)
+    else:
+        # Otherwise query Spotify
+        blended_playlist = []
+        for link in playlists:
+            spotify_playlist = find_spotify_playlists(playlist_url=link)
+            blended_playlist.extend(spotify_playlist)
+        # Cache playlist
+        with open(cached_playlist_file_path, 'wb') as file:
+            pickle.dump(blended_playlist, file)
+
+    # Remove duplicate tracks
+    blended_playlist_set = set(blended_playlist)
+    blended_spotify_playlist = list(blended_playlist_set)
+
+    # Filter unwanted genres
+    blended_playlist = filter_playlist(blended_playlist, exclude_genres_lists)
+
+    # shuffle merge playlist
+    if shuffle:
+        random.seed(42)
+        random.shuffle(blended_spotify_playlist)
+
+    # Return the new playlist
+    return blended_spotify_playlist
+
 
 
 def blend_playlist(context: str, preferences_list: list, exclude_genres_lists: list=[], intersect: bool=False, shuffle: bool=True) ->list:
@@ -152,3 +216,5 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
 # print(blend)
 # yt_urls = find_youtube_urls_of_spotify_playlist(blend)
 # print(yt_urls)
+
+# print(blend_playlist_local("Designing"))
