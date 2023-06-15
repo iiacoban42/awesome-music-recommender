@@ -69,6 +69,7 @@ def get_new_playlist(request):
 
     return JsonResponse({"playlist_blend": blend})
 
+
 def get_dummy_playlist(request):
     """Create new playlist based on genres and context"""
 

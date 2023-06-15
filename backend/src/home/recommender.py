@@ -144,7 +144,7 @@ def filter_playlist(blended_spotify_playlist: list, preferences_list: list, excl
     for track, artist, genres in blended_spotify_playlist:
         track_score = 0
         for genre, genre_score in result.items():
-            if genre in genres:
+            if genre.lower() in genres:
                 track_score = track_score + genre_score
         if track_score >= 0:
             filtered_playlist.append(tuple((track_score, track, artist, genres)))
@@ -248,4 +248,4 @@ def find_youtube_urls_of_spotify_playlist(spotify_playlist: list) -> list:
 # print(yt_urls)
 
 # blend_playlist_curated("Designing", [['rock']], [['pop']])
-# print(blend_playlist_curated("Designing", [['classical']], [[]]))
+print(blend_playlist_curated("Designing", [['classical']], [[]]))
