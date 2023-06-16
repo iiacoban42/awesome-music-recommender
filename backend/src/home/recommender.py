@@ -165,7 +165,7 @@ def filter_playlist(blended_spotify_playlist: list, preferences_list: list, excl
 def blend_playlist_curated(context: str, preferences_list: list, exclude_genres_lists: list) -> list:
 
     # Open the file and load the JSON data
-    with open('backend/src/home/playlists.json', 'r', encoding='UTF-8') as file:
+    with open('home/playlists.json', 'r', encoding='UTF-8') as file:
         playlist_library = json.load(file)
 
     if context not in playlist_library:
@@ -173,7 +173,7 @@ def blend_playlist_curated(context: str, preferences_list: list, exclude_genres_
 
     playlists = playlist_library[context]
 
-    cached_playlist_file_path = f'backend/src/home/cached/{context}.pickle'
+    cached_playlist_file_path = f'home/cached/{context}.pickle'
     # Check if the playlist is cached
     if os.path.exists(cached_playlist_file_path):
         with open(cached_playlist_file_path, 'rb') as file:
